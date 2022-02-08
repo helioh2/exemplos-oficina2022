@@ -1,0 +1,57 @@
+Programação... o que é?
+
+- você desenvolve alguma coisa:
+	- para resolver um problema (fazer a solução para o problema)
+	- para facilitar a vida das pessoas
+	- automatizar um processo
+
+- Programação (desenvolvimento de software) é um Processo:
+	- entender o problema (levantar e compreender os requisitos)
+	- projetar (desenhar) - design, modelar...
+	- codar
+
+	- conhecimento/informação do domínio do problema --> dados / informação codificada
+		- programa -> manipula dados 
+
+	- envolve pensamento:
+		- lógica / racional
+		- matemático
+		- intelectual
+		- criativo
+
+	- pensamento pessimista (pensar nos piores casos)
+	- testes !!!
+
+	- lidar com a complexidade
+		- tornar mais simples (abstração) --> KISS (Keep It Simple Stupid)
+		- destrinchar o problema em problemas menores
+		- dividir para conquistar
+
+	- programador tem que ser autodidata
+
+	- envolve conhecimento de computação 
+
+	- envolve trabalho em equipe (colaboração)
+
+- Quais características de um programa de qualidade?
+
+	- fácil manutenção (manutenibilidade) --> código *bem feito e estruturado* e *documentado*
+	- legibilidade --> fácil de ler
+	- boas práticas de programação
+	- Não usar POG (programação orientada a gambiarra) --> talvez fazer refatoração
+
+	- eficácia
+		- fazer o que tem que fazer
+	- eficiência
+		- uso eficiente dos recursos computacionais
+	- segurança
+	- confiabilidade
+
+
+
+DDD -> Domain Driven Design  ---> nomes ubíquos, conceitos de domínio representados no código
+
+
+Coding Dojo
+
+
