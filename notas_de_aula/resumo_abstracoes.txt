@@ -1,0 +1,38 @@
+
+
+ABSTRAÇÕES:
+	- Abstração de controle
+		- Subprogramas --> procedimentos (não retorna valor), funções (retorna valor), métodos (em programas orientados a objetos, alteram o estado interno de um objeto)
+			-> f(x) = x^2   --> f(1) = 1 (valor); f(2) = 4 (valor)
+
+			void algumacoisa(int x, int* y){ // Exemplo de procedimento
+				y->campo = 20;
+				print(x);
+			}
+
+			int dobro(int x){ // Exemplo de função
+				return x * 2;
+			}
+
+
+			variavel1 = algumacoisa(10)  // NÃO DÁ CERTO POIS algumacoisa NAO RETORNA VALOR
+			//variavel nao vai ter o valor 10
+
+			variavel2 = dobro(5) 
+			//varialve vai ter o valor 10
+
+	- Abstração de dados
+		- Definição de estruturas de dados
+
+			-> struct pessoa {string nome; string cpf;}
+			-> struct node_lista_encadeada {int valor; node_lista_encadeada proximo;}
+
+			pessoa1 = malloc(sizeof(pessoa))
+			pessoa1->nome = "Fulano"
+			pessoa1->cpf = "1616161616"
+
+			pessoa2 = malloc(sizeof(pessoa))
+			pessoa2->nome = "Beltrano"
+			pessoa2->cpf = "33434343"
+
+		- Definição de dados simples relacionados ao domínio da aplicação
