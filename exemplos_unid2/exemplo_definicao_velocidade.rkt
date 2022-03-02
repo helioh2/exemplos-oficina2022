@@ -31,8 +31,29 @@
 
 ; Template:
 #;
-;(define (fn-para-tempo t)
-;  (... t))
+(define (fn-para-tempo t)
+  (cond
+    [(< t 0) "ERRO"]
+    [else ...]))
+
+; para-minutos: Tempo -> Numero
+; converte o empo em horas para minuos
+
+;stub (prototipo bobo)
+(define (para-minutos t) t)
+
+;Testes (exemplos)
+(check-expect (para-minutos 1) 60)
+(check-expect (para-minutos -10) "ERRO")
+(check-expect (para-minutos 0) 0)
+
+
+
+
+
+
+
+
 
 
 ;; ...
