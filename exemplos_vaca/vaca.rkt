@@ -9,25 +9,31 @@
 ;; =================
 ;; Constantes:
 
-(define ALTURA-CENARIO 300)
-(define LARGURA-CENARIO 400)
+(define ALTURA-CENARIO 600)
+(define LARGURA-CENARIO 800)
 (define CENARIO (empty-scene LARGURA-CENARIO ALTURA-CENARIO))
 
 (define MEIO (/ LARGURA-CENARIO 2))
 
 (define IMG-VACA (bitmap "vaca.png"))
+(define IMG-CC (scale 0.5 (bitmap "chupacabra.jpg")))
 
 (define LIMITE-ESQUERDO (+ 0 (/ (image-width IMG-VACA) 2)))
 (define LIMITE-DIREITO (- LARGURA-CENARIO (/ (image-width IMG-VACA) 2)))
+(define LIMITE-CIMA (+ 0 (/ (image-height IMG-CC) 2)))
+(define LIMITE-BAIXO (- ALTURA-CENARIO (/ (image-height IMG-CC) 2)))
 
-(define Y (/ ALTURA-CENARIO 2))
 
+(define Y-VACA (/ ALTURA-CENARIO 2))
+(define X-CC (/ LARGURA-CENARIO 2))
 
-(define DX-PADRAO 3)
+(define DX-PADRAO-VACA 3)
+(define DY-PADRAO-CC 20)
 (define TC-VIRA " ")
 
 ;; =================
 ;; Definições de dados:
+
 
 (define-struct vaca (x dx))
 ;; Vaca é (make-vaca Natural Inteiro)
@@ -35,20 +41,59 @@
 ;; se dx>=0, vaca estará apontando para a direita, se dx<0, estará apontando p/ esquerda
 
 ;; Exemplos:
-(define VACA-INICIO (make-vaca LIMITE-ESQUERDO DX-PADRAO))
-(define VACA-INO (make-vaca MEIO DX-PADRAO))
-(define VACA-LIMITE-DIREITO (make-vaca LIMITE-DIREITO DX-PADRAO))
-(define VACA-VORTANO (make-vaca MEIO (- DX-PADRAO)))
-(define VACA-VORTANO-LIMITE-ESQUERDO (make-vaca LIMITE-ESQUERDO (- DX-PADRAO)))
+(define VACA-INICIO (make-vaca LIMITE-ESQUERDO DX-PADRAO-VACA))
+(define VACA-INO (make-vaca MEIO DX-PADRAO-VACA))
+(define VACA-LIMITE-DIREITO (make-vaca LIMITE-DIREITO DX-PADRAO-VACA))
+(define VACA-VORTANO (make-vaca MEIO (- DX-PADRAO-VACA)))
+(define VACA-VORTANO-LIMITE-ESQUERDO (make-vaca LIMITE-ESQUERDO (- DX-PADRAO-VACA)))
 
 ;#
 (define (fn-para-vaca v)
   (... (vaca-x v)
        (vaca-dx v)))
 
+
+(define-struct chupacabra (y dy))
+;; Chupacabra é (make-chupacabra Natural Inteiro)
+;; interp. posicao do chupacabra no eixo y e a direção dy, em pixels.
+
+;; Exemplos:
+(define CC-INICIO (make-chupacabra LIMITE-CIMA DY-PADRAO-CC))
+(define CC-INO (make-chupacabra MEIO DY-PADRAO-CC))
+(define CC-LIMITE-BAIXO (make-chupacabra LIMITE-BAIXO DY-PADRAO-CC))
+(define CC-VORTANO (make-chupacabra MEIO (- DY-PADRAO-CC)))
+(define CC-VORTANO-LIMITE-CIMA (make-chupacabra LIMITE-CIMA (- DY-PADRAO-CC)))
+
+;#
+(define (fn-para-cc cc)
+  (... (chupacabra-y cc)
+       (chupacabra-dy cc)))
+
+
+(define-struct jogo (vaca cc mortes game-over?))
+;; Jogo é (make-jogo Vaca Chupacabra Natural Boolean)
+;; interp. jogo contendo uma vaca e um chupacabra, e uma contagem de mortes, e uma flag
+;; que indica se o jogo está em estado de game over ou não
+
+;; Exemplos:
+(define JOGO-INICIO (make-jogo VACA-INICIO CC-INICIO 0 #false))
+(define JOGO-MEIO (make-jogo VACA-INO CC-VORTANO 0 #false))
+(define JOGO-COLIDINDO (make-jogo VACA-INO CC-INO 0 #false))
+(define JOGO-GAME-OVER (make-jogo VACA-INO CC-INO 1 #true))
+(define JOGO-REINICIADO (make-jogo VACA-INICIO CC-INICIO 1 #false))
+
+;#
+(define (fn-para-jogo j)
+  (... (jogo-vaca j)
+       (jogo-cc j)
+       (jogo-mortes j)
+       (jogo-game-over? j))
+  )
+
 ;; =================
 ;; Funções:
 
+;; --------------------- INICIO FUNCOES DA VACA ------------------
 
 ;; Vaca -> Vaca
 ;; produz o próximo estado da vaca
@@ -106,25 +151,24 @@
 (define (desenha-vaca v)
   (cond
     [(< (vaca-dx v) 0)
-     (place-image (flip-horizontal IMG-VACA) (vaca-x v) Y CENARIO)]
+     (place-image (flip-horizontal IMG-VACA) (vaca-x v) Y-VACA CENARIO)]
     [else
-     (place-image IMG-VACA (vaca-x v) Y CENARIO)]
+     (place-image IMG-VACA (vaca-x v) Y-VACA CENARIO)]
     )
   )
 
 ; Testes
 (check-expect (desenha-vaca (make-vaca 0 3))
-              (place-image IMG-VACA 0 Y CENARIO))
+              (place-image IMG-VACA 0 Y-VACA CENARIO))
   
 (check-expect (desenha-vaca (make-vaca MEIO 3))
-              (place-image IMG-VACA MEIO Y CENARIO))
+              (place-image IMG-VACA MEIO Y-VACA CENARIO))
 (check-expect (desenha-vaca (make-vaca MEIO -3))
-              (place-image (flip-horizontal IMG-VACA) MEIO Y CENARIO))
+              (place-image (flip-horizontal IMG-VACA) MEIO Y-VACA CENARIO))
 
 
 ;; Vaca KeyEvent -> Vaca
 ;; quando teclar ESPAÇO vira a vaca (inverte dx)
-; !!! (TODO)
 
 (define (trata-tecla v ke)
   (cond [(key=? ke " ") (make-vaca (vaca-x v) (- (vaca-dx v)))]
@@ -138,14 +182,118 @@
 (check-expect (trata-tecla (make-vaca MEIO 3) "a")
               (make-vaca MEIO 3))
 
-;; Vaca -> Vaca
-;; inicie o mundo com (main VACA-INICIO)
+
+;; --------------------- INICIO FUNCOES DO CHUPACABRA -----------
+
+;; Chupacabra -> Chupacabra
+;; produz o próximo estado do chupacabra
+;; !!!
+
+;stub
+;(define (atualiza-chupacabra cc) cc)
+
+(define (atualiza-chupacabra cc)
+  (cond 
+        [(> (chupacabra-y cc) LIMITE-BAIXO)
+         (make-chupacabra LIMITE-BAIXO (- (chupacabra-dy cc)))]
+        [(< (chupacabra-y cc) LIMITE-CIMA)
+         (make-chupacabra LIMITE-CIMA (- (chupacabra-dy cc)))]
+        [else
+         (make-chupacabra (+ (chupacabra-y cc) (chupacabra-dy cc))
+             (chupacabra-dy cc))])
+ )
+
+
+; exemplos / testes
+;casos em que ele anda pra baixo sem chegar no limite
+(check-expect (atualiza-chupacabra (make-chupacabra LIMITE-CIMA 10))
+              (make-chupacabra (+ LIMITE-CIMA 10) 10))
+;(check-expect (atualiza-chupacabra CC-INO)
+;              (make-chupacabra (+ (/ LIMITE-BAIXO 2) DY-PADRAO-CC)
+;                          DY-PADRAO-CC))
+; casos em que chega no limite baixo e tem que ccirar
+;(check-expect (atualiza-chupacabra CC-ANTES-VIRAR)
+;              CC-VIROU)
+
+; caso em que ela anda pra cima sem chegar no limite 
+(check-expect (atualiza-chupacabra
+               (make-chupacabra (/ LIMITE-BAIXO 2) (- DY-PADRAO-CC)))
+              (make-chupacabra (- (/ LIMITE-BAIXO 2) DY-PADRAO-CC)
+                                       (- DY-PADRAO-CC)))
+
+; casos em que chega no limite cima e tem que virar
+(check-expect (atualiza-chupacabra (make-chupacabra (- LIMITE-CIMA 10) -10))
+                            (make-chupacabra LIMITE-CIMA 10))
+(check-expect (atualiza-chupacabra (make-chupacabra (- LIMITE-CIMA 20) -50))
+                            (make-chupacabra LIMITE-CIMA 50))
+
+
+
+
+;; --------------------- INICIO FUNCOES DO JOGO ------------------
+
+;; Jogo -> Jogo
+;; produz o próximo estado do jogo
+;; !!!
+
+;stub
+;(define (atualiza-jogo j) j)
+
+(define (atualiza-jogo j)
+  (make-jogo
+   (atualiza-vaca (jogo-vaca j))
+   (atualiza-chupacabra (jogo-cc j))
+   (jogo-mortes j)
+   (jogo-game-over? j))
+  )
+
+; Testes
+(check-expect (atualiza-jogo JOGO-INICIO)
+              (make-jogo
+               (make-vaca (+ LIMITE-ESQUERDO DX-PADRAO-VACA) DX-PADRAO-VACA)
+               (make-chupacabra (+ LIMITE-CIMA DY-PADRAO-CC) DY-PADRAO-CC)
+               0
+               #false))
+                          
+                          
+
+
+;; Jogo -> Image
+;; desenha o jogo com os seus elementos
+;; !!!
+
+;stub
+(define (desenha-jogo j)
+  (place-image IMG-CC X-CC (chupacabra-y (jogo-cc j))
+               (desenha-vaca (jogo-vaca j))
+  )
+  )
+
+; Testes
+(check-expect (desenha-jogo JOGO-INICIO)
+              (place-image IMG-CC X-CC LIMITE-CIMA
+                           (place-image IMG-VACA LIMITE-ESQUERDO Y-VACA CENARIO)))
+
+
+;; Jogo KeyEvent -> Jogo
+;; quando teclar ...  produz ...  <apagar caso não precise usar>
+#;
+(define (trata-telca-jogo j ke)
+  (cond [(key=? ke " ") (... j)]
+        [else
+         (... j)]))
+;stub
+(define (trata-tecla-jogo j ke) j)
+
+
+;; Jogo -> Jogo
+;; inicie o mundo com (main JOGO-INICIO)
 ;; 
 (define (main v)
-  (big-bang v               ; Vaca   (estado inicial do mundo)
-            (on-tick   atualiza-vaca)     ; Vaca -> Vaca    
+  (big-bang v               ; Jogo   (estado inicial do mundo)
+            (on-tick   atualiza-jogo)     ; Jogo -> Jogo    
                                    ;(retorna um novo estado do mundo dado o atual a cada tick do clock)
-            (to-draw   desenha-vaca)   ; Vaca -> Image   
+            (to-draw   desenha-jogo)   ; Jogo -> Image   
                                           ;(retorna uma imagem que representa o estado atual do mundo)
-            (on-key    trata-tecla)))    ; Vaca KeyEvent -> Vaca
+            (on-key    trata-tecla-jogo)))    ; Jogo KeyEvent -> Jogo
                                     ;(retorna um novo estado do mundo dado o estado atual e uma interação com o teclado)
