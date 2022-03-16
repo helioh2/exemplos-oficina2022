@@ -13,10 +13,14 @@
 (define LARGURA-CENARIO 800)
 (define CENARIO (empty-scene LARGURA-CENARIO ALTURA-CENARIO))
 
-(define MEIO (/ LARGURA-CENARIO 2))
+(define MEIO-X (/ LARGURA-CENARIO 2))
+(define MEIO-Y (/ ALTURA-CENARIO 2))
 
 (define IMG-VACA (bitmap "vaca.png"))
 (define IMG-CC (scale 0.5 (bitmap "chupacabra.jpg")))
+
+(define METADE-L-VACA (/ (image-width IMG-VACA) 2))
+(define METADE-L-CC (/ (image-width IMG-CC) 2))
 
 (define LIMITE-ESQUERDO (+ 0 (/ (image-width IMG-VACA) 2)))
 (define LIMITE-DIREITO (- LARGURA-CENARIO (/ (image-width IMG-VACA) 2)))
@@ -31,64 +35,7 @@
 (define DY-PADRAO-CC 20)
 (define TC-VIRA " ")
 
-;; =================
-;; Definições de dados:
 
-
-(define-struct vaca (x dx))
-;; Vaca é (make-vaca Natural Inteiro)
-;; interp. posicao da vaca no eixo x e a direção dx, em pixels.
-;; se dx>=0, vaca estará apontando para a direita, se dx<0, estará apontando p/ esquerda
-
-;; Exemplos:
-(define VACA-INICIO (make-vaca LIMITE-ESQUERDO DX-PADRAO-VACA))
-(define VACA-INO (make-vaca MEIO DX-PADRAO-VACA))
-(define VACA-LIMITE-DIREITO (make-vaca LIMITE-DIREITO DX-PADRAO-VACA))
-(define VACA-VORTANO (make-vaca MEIO (- DX-PADRAO-VACA)))
-(define VACA-VORTANO-LIMITE-ESQUERDO (make-vaca LIMITE-ESQUERDO (- DX-PADRAO-VACA)))
-
-;#
-(define (fn-para-vaca v)
-  (... (vaca-x v)
-       (vaca-dx v)))
-
-
-(define-struct chupacabra (y dy))
-;; Chupacabra é (make-chupacabra Natural Inteiro)
-;; interp. posicao do chupacabra no eixo y e a direção dy, em pixels.
-
-;; Exemplos:
-(define CC-INICIO (make-chupacabra LIMITE-CIMA DY-PADRAO-CC))
-(define CC-INO (make-chupacabra MEIO DY-PADRAO-CC))
-(define CC-LIMITE-BAIXO (make-chupacabra LIMITE-BAIXO DY-PADRAO-CC))
-(define CC-VORTANO (make-chupacabra MEIO (- DY-PADRAO-CC)))
-(define CC-VORTANO-LIMITE-CIMA (make-chupacabra LIMITE-CIMA (- DY-PADRAO-CC)))
-
-;#
-(define (fn-para-cc cc)
-  (... (chupacabra-y cc)
-       (chupacabra-dy cc)))
-
-
-(define-struct jogo (vaca cc mortes game-over?))
-;; Jogo é (make-jogo Vaca Chupacabra Natural Boolean)
-;; interp. jogo contendo uma vaca e um chupacabra, e uma contagem de mortes, e uma flag
-;; que indica se o jogo está em estado de game over ou não
-
-;; Exemplos:
-(define JOGO-INICIO (make-jogo VACA-INICIO CC-INICIO 0 #false))
-(define JOGO-MEIO (make-jogo VACA-INO CC-VORTANO 0 #false))
-(define JOGO-COLIDINDO (make-jogo VACA-INO CC-INO 0 #false))
-(define JOGO-GAME-OVER (make-jogo VACA-INO CC-INO 1 #true))
-(define JOGO-REINICIADO (make-jogo VACA-INICIO CC-INICIO 1 #false))
-
-;#
-(define (fn-para-jogo j)
-  (... (jogo-vaca j)
-       (jogo-cc j)
-       (jogo-mortes j)
-       (jogo-game-over? j))
-  )
 
 ;; =================
 ;; Funções:
@@ -119,8 +66,8 @@
 ; CENARIOS DA VACA ANDANDO DE BOA PARA FRENTE
 (check-expect (atualiza-vaca (make-vaca LIMITE-ESQUERDO 3))  ; CHAMADA
               (make-vaca (+ LIMITE-ESQUERDO 3) 3))    ; RESULTADO ESPERADO
-(check-expect (atualiza-vaca (make-vaca MEIO 3))  ; CHAMADA
-              (make-vaca (+ MEIO 3) 3))  
+(check-expect (atualiza-vaca (make-vaca MEIO-X 3))  ; CHAMADA
+              (make-vaca (+ MEIO-X 3) 3))  
 
 ;; CENARIOS DA VACA BATENDO NA CERCA DA DIREITO
 (check-expect (atualiza-vaca (make-vaca LIMITE-DIREITO 3))
@@ -131,8 +78,8 @@
               (make-vaca LIMITE-DIREITO -3))
 
 ;; CENARIOS DA VACA ANDANDO DE BOA PARA TRAS
-(check-expect (atualiza-vaca (make-vaca MEIO -3)) 
-              (make-vaca (- MEIO 3) -3))
+(check-expect (atualiza-vaca (make-vaca MEIO-X -3)) 
+              (make-vaca (- MEIO-X 3) -3))
 (check-expect (atualiza-vaca (make-vaca (+ LIMITE-ESQUERDO 3) -3)) 
               (make-vaca LIMITE-ESQUERDO -3))
 
@@ -161,10 +108,10 @@
 (check-expect (desenha-vaca (make-vaca 0 3))
               (place-image IMG-VACA 0 Y-VACA CENARIO))
   
-(check-expect (desenha-vaca (make-vaca MEIO 3))
-              (place-image IMG-VACA MEIO Y-VACA CENARIO))
-(check-expect (desenha-vaca (make-vaca MEIO -3))
-              (place-image (flip-horizontal IMG-VACA) MEIO Y-VACA CENARIO))
+(check-expect (desenha-vaca (make-vaca MEIO-X 3))
+              (place-image IMG-VACA MEIO-X Y-VACA CENARIO))
+(check-expect (desenha-vaca (make-vaca MEIO-X -3))
+              (place-image (flip-horizontal IMG-VACA) MEIO-X Y-VACA CENARIO))
 
 
 ;; Vaca KeyEvent -> Vaca
@@ -177,10 +124,10 @@
 
 
 ;; Testes
-(check-expect (trata-tecla (make-vaca MEIO 3) " ")
-              (make-vaca MEIO -3))
-(check-expect (trata-tecla (make-vaca MEIO 3) "a")
-              (make-vaca MEIO 3))
+(check-expect (trata-tecla (make-vaca MEIO-X 3) " ")
+              (make-vaca MEIO-X -3))
+(check-expect (trata-tecla (make-vaca MEIO-X 3) "a")
+              (make-vaca MEIO-X 3))
 
 
 ;; --------------------- INICIO FUNCOES DO CHUPACABRA -----------
@@ -232,6 +179,52 @@
 
 ;; --------------------- INICIO FUNCOES DO JOGO ------------------
 
+
+;; distancia: Natural Natural Natural Natural -> Numero
+;; calcula a distancia euclidiana entre dois pontos
+; !!!
+
+;stub
+(define (distancia x1 y1 x2 y2)
+  (sqrt (+ (sqr (- x2 x1)) (sqr (- y2 y1)))))
+
+; Testes
+(check-expect (distancia 0 0 3 4) 5)
+(check-expect (distancia 2 3 5 3) 3)
+(check-expect (distancia 1 1 4 5) 5)
+(check-expect (distancia 2 3 2 3) 0)
+(check-within (distancia 5 7 10 20) (sqrt (+ (sqr (- 10 5)) (sqr (- 20 7)))) 0.01)
+(check-expect (distancia (- MEIO-X METADE-L-VACA METADE-L-CC) Y-VACA X-CC MEIO-Y)
+              (- MEIO-X (- MEIO-X METADE-L-VACA METADE-L-CC)))
+
+;; colidindo-vaca-cc?: Vaca, Chupacabra -> Boolean
+;; Retorna true se vaca e cc estiverem colidindo, ou false caso contrário
+;; !!!
+
+;stub
+;(define (colidindo-vaca-cc? v cc) #false)
+
+(define (colidindo-vaca-cc? v cc)
+    (<= (distancia (vaca-x v) Y-VACA X-CC (chupacabra-y cc))
+      (+ METADE-L-VACA METADE-L-CC))
+  )
+
+
+;; Testes
+(check-expect (colidindo-vaca-cc?
+               (make-vaca LIMITE-ESQUERDO 3)
+               (make-chupacabra MEIO-Y 10))
+              #false)
+
+(check-expect (colidindo-vaca-cc?
+               (make-vaca (- MEIO-X METADE-L-VACA METADE-L-CC) 3)
+               (make-chupacabra MEIO-Y 10))
+              #true)
+
+
+
+
+
 ;; Jogo -> Jogo
 ;; produz o próximo estado do jogo
 ;; !!!
@@ -240,14 +233,25 @@
 ;(define (atualiza-jogo j) j)
 
 (define (atualiza-jogo j)
-  (make-jogo
-   (atualiza-vaca (jogo-vaca j))
-   (atualiza-chupacabra (jogo-cc j))
-   (jogo-mortes j)
-   (jogo-game-over? j))
+  (cond
+    [(colidindo-vaca-cc? (jogo-vaca j) (jogo-cc j))
+     (make-jogo
+      (jogo-vaca j)
+      (jogo-cc j)
+      (+ (jogo-mortes j) 1)
+      #true)]
+    [else
+     (make-jogo
+      (atualiza-vaca (jogo-vaca j))
+      (atualiza-chupacabra (jogo-cc j))
+      (jogo-mortes j)
+      (jogo-game-over? j))]
+    )
   )
+  
 
-; Testes
+;; Testes
+; CASO NORMAL
 (check-expect (atualiza-jogo JOGO-INICIO)
               (make-jogo
                (make-vaca (+ LIMITE-ESQUERDO DX-PADRAO-VACA) DX-PADRAO-VACA)
@@ -255,7 +259,21 @@
                0
                #false))
                           
-                          
+; CASOS COLISAO
+(check-expect (atualiza-jogo JOGO-COLIDINDO1)
+              (make-jogo
+               (make-vaca (- MEIO-X METADE-L-VACA METADE-L-CC) 3)
+               (make-chupacabra MEIO-Y 10)                 
+                1 #true)
+              )
+
+(check-expect (atualiza-jogo JOGO-COLIDINDO2)
+              (make-jogo
+               (make-vaca (+ (- MEIO-X METADE-L-VACA METADE-L-CC) 3) 3)
+               (make-chupacabra MEIO-Y 10)                 
+                1 #true)
+              )
+
 
 
 ;; Jogo -> Image
@@ -264,15 +282,32 @@
 
 ;stub
 (define (desenha-jogo j)
-  (place-image IMG-CC X-CC (chupacabra-y (jogo-cc j))
-               (desenha-vaca (jogo-vaca j))
-  )
+  (place-image (text (string-append "mortes: " (number->string (jogo-mortes j))) 25 "blue")
+               (- LARGURA-CENARIO 80) 30 
+               (cond
+                 [(jogo-game-over? j)
+                  (place-image (text "GAME OVER" 50 "red") MEIO-X MEIO-Y CENARIO)]
+                 [else
+                  (place-image IMG-CC X-CC (chupacabra-y (jogo-cc j))
+                               (desenha-vaca (jogo-vaca j))
+                               )]
+                 )
+               )
   )
 
 ; Testes
+;(define JOGO-GAME-OVER (make-jogo
+;                        (make-vaca (- MEIO-X METADE-L-VACA METADE-L-CC) 3)
+;                        (make-chupacabra MEIO-Y 10)                 
+;                        1 #true))
+
+
 (check-expect (desenha-jogo JOGO-INICIO)
               (place-image IMG-CC X-CC LIMITE-CIMA
                            (place-image IMG-VACA LIMITE-ESQUERDO Y-VACA CENARIO)))
+
+(check-expect (desenha-jogo JOGO-GAME-OVER)
+              (place-image (text "GAME OVER" 50 "red") MEIO-X MEIO-Y CENARIO))
 
 
 ;; Jogo KeyEvent -> Jogo
