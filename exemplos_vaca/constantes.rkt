@@ -43,3 +43,4 @@
 (define DY-PADRAO-CC 20)
 
 (define TC-VIRA " ")
+(define TC-REINICIO "\r")

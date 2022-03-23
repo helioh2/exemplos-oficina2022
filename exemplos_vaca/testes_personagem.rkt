@@ -56,3 +56,29 @@
                (make-personagem X-PADRAO-CC MEIO-Y 0 10   50 60))        
               #true)
 
+
+;; Testes do colidindo-com-algum?
+(check-equal? (colidindo-com-algum? VACA-INICIO (list CC-INICIO CC-INO))
+              #false)
+(check-equal? (colidindo-com-algum? (make-personagem (- MEIO-X 15 25) Y-PADRAO-VACA 3 0  30 40)
+                                    (list (make-personagem X-PADRAO-CC MEIO-Y 0 10   50 60)
+                                          CC-INICIO ))                                      
+              #true)
+
+(check-equal? (colidindo-com-algum? (make-personagem (- MEIO-X 15 25) Y-PADRAO-VACA 3 0  30 40)
+                                    (list CC-INICIO
+                                          (make-personagem X-PADRAO-CC MEIO-Y 0 10   50 60)
+                                          ))
+              
+              #true)
+(check-equal? (colidindo-com-algum? VACA-INICIO empty) #false)
+
+
+;; Testes do move-personagens
+(check-equal? (move-personagens (list CC-INICIO CC-INO))
+              (list CC-INICIO-PROX CC-INO-PROX))
+(check-equal? (move-personagens (list CC-INO CC-INICIO))
+              (list CC-INO-PROX CC-INICIO-PROX))
+(check-equal? (move-personagens empty) empty)
+
+                                    

@@ -252,7 +252,7 @@
 
 ;; Testes
 ; CASO NORMAL
-(check-expect (atualiza-jogo JOGO-INICIO)
+(check-expect (atualiza-jogo JOGO-INICIO-ANTIGO) 
               (make-jogo
                (make-vaca (+ LIMITE-ESQUERDO DX-PADRAO-VACA) DX-PADRAO-VACA)
                (make-chupacabra (+ LIMITE-CIMA DY-PADRAO-CC) DY-PADRAO-CC)
@@ -302,7 +302,7 @@
 ;                        1 #true))
 
 
-(check-expect (desenha-jogo JOGO-INICIO)
+(check-expect (desenha-jogo JOGO-INICIO-ANTIGO) 
               (place-image IMG-CC X-CC LIMITE-CIMA
                            (place-image IMG-VACA LIMITE-ESQUERDO Y-VACA CENARIO)))
 
@@ -322,7 +322,7 @@
 
 
 ;; Jogo -> Jogo
-;; inicie o mundo com (main JOGO-INICIO)
+;; inicie o mundo com (main JOGO-INICIO-ANTIGO) 
 ;; 
 (define (main v)
   (big-bang v               ; Jogo   (estado inicial do mundo)
